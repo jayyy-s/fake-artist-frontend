@@ -35,6 +35,7 @@ const DrawingBoard = () => {
   const context = canvas?.getContext("2d");
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDrawingTurn, setIsDrawingTurn] = useState(false);
+  const [isHost, setIsHost] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
   const color = "#000000"; // TODO: Let players select colors? Somehow give players different colors
   const { gameId } = useParams();
@@ -55,7 +56,6 @@ const DrawingBoard = () => {
     e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ): void => {
     e.preventDefault();
-    if (!isDrawingTurn) return;
     setIsDrawing(true);
     setPreviousPosition({
       x: e.nativeEvent.offsetX,
@@ -67,7 +67,7 @@ const DrawingBoard = () => {
     e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ): void => {
     e.preventDefault();
-    if (!isDrawing || !canvas || !context || !isDrawingTurn) return;
+    if (!isDrawing || !canvas || !context) return;
 
     const currentPosition: Point = {
       x: e.nativeEvent.offsetX,
@@ -83,7 +83,7 @@ const DrawingBoard = () => {
     e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
     e.preventDefault();
-    if (!canvas || !isDrawingTurn) return;
+    if (!canvas) return;
 
     try {
       updateImage({ canvasState: canvas.toDataURL(), gameId }).then(() => {
@@ -140,6 +140,9 @@ const DrawingBoard = () => {
 
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
+        case "setHostClient":
+          setIsHost(true);
+          break;
         case "drawCurrentCanvasState":
           handleRedrawCurrentCanvasState(context);
           break;
@@ -158,7 +161,7 @@ const DrawingBoard = () => {
   ]);
 
   return (
-    <div className="border border-black rounded relative overflow-hidden inline-block">
+    <div className="bg-white border border-black rounded relative overflow-hidden inline-block">
       <canvas
         ref={canvasRef}
         onMouseDown={handleMouseDown}
@@ -167,6 +170,11 @@ const DrawingBoard = () => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       />
+      <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
+        <div className="btn-fake-yellow">
+          Start Game
+        </div>
+      </div>
     </div>
   );
 };
