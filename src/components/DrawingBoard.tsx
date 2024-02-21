@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { drawLine } from "../utils/drawLine";
 import useWebSocket from "react-use-websocket";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   useUpdateImageMutation,
   useFetchGameByIdMutation,
@@ -34,23 +34,28 @@ const DrawingBoard = () => {
   const canvas = canvasRef.current ? canvasRef.current : null;
   const context = canvas?.getContext("2d");
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isDrawingTurn, setIsDrawingTurn] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
-  const color = "#000000";
+  const color = "#000000"; // TODO: Let players select colors? Somehow give players different colors
   const { gameId } = useParams();
 
+  const navigate = useNavigate();
+
+  const [updateImage] = useUpdateImageMutation();
+  const [fetchGameById] = useFetchGameByIdMutation();
+
+  // ISSUE: Establsihing ws connection before I know the game exists
   const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
     WS_URL,
     { share: true }
   );
-
-  const [updateImage] = useUpdateImageMutation();
-  const [fetchGameById] = useFetchGameByIdMutation();
 
   // Handle mouse down (allow to draw line)
   const handleMouseDown = (
     e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ): void => {
     e.preventDefault();
+    if (!isDrawingTurn) return;
     setIsDrawing(true);
     setPreviousPosition({
       x: e.nativeEvent.offsetX,
@@ -62,7 +67,7 @@ const DrawingBoard = () => {
     e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ): void => {
     e.preventDefault();
-    if (!isDrawing || !canvas || !context) return;
+    if (!isDrawing || !canvas || !context || !isDrawingTurn) return;
 
     const currentPosition: Point = {
       x: e.nativeEvent.offsetX,
@@ -78,9 +83,12 @@ const DrawingBoard = () => {
     e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
   ) => {
     e.preventDefault();
-    if (!canvas) return;
+    if (!canvas || !isDrawingTurn) return;
+
     try {
       updateImage({ canvasState: canvas.toDataURL(), gameId }).then(() => {
+        // set drawing turn to false after canvas state updated
+        setIsDrawingTurn(false);
         sendJsonMessage({
           type: "drawLine",
           data: { gameId },
@@ -99,19 +107,20 @@ const DrawingBoard = () => {
     const context = canvas?.getContext("2d");
     if (!context) return;
 
-    if (!isClientReady) {
+    const clientReadyHandler = async () => {
       try {
-        fetchGameById({ gameId })
-          .unwrap()
-          .then((res) => {
-            loadImage(context, res.canvasState);
-          });
+        const game = await fetchGameById({ gameId }).unwrap();
+        loadImage(context, game.canvasState);
+        sendJsonMessage({ type: "clientReady", data: { gameId } });
+        setIsClientReady(true);
       } catch (err) {
-        const e = err as Error;
-        console.log(e?.message);
+        // if game not found (or something else went wrong) go back to the home page
+        navigate("/");
       }
-      sendJsonMessage({ type: "clientReady", data: { gameId } });
-      setIsClientReady(true);
+    };
+
+    if (!isClientReady) {
+      clientReadyHandler();
     }
 
     const loadImage = (ctx: CanvasRenderingContext2D, imageSrc: string) => {
@@ -134,15 +143,18 @@ const DrawingBoard = () => {
         case "drawCurrentCanvasState":
           handleRedrawCurrentCanvasState(context);
           break;
+        case "drawingTurn":
+          setIsDrawingTurn(true);
+          break;
       }
     }
   }, [
-    canvasRef,
     isClientReady,
     lastJsonMessage,
     gameId,
     sendJsonMessage,
     fetchGameById,
+    navigate,
   ]);
 
   return (

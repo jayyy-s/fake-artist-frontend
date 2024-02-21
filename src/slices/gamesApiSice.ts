@@ -17,6 +17,12 @@ export const gamesApiSlice = apiSlice.injectEndpoints({
         body: { canvasState },
       }),
     }),
+    addPlayer: builder.mutation({
+      query: ({ gameId }) => ({
+        url: `${GAME_URL}/${gameId}`,
+        method: "PUT",
+      }),
+    }),
     fetchGameById: builder.mutation({
       query: ({ gameId }) => ({
         url: `${GAME_URL}/${gameId}`,
@@ -29,5 +35,6 @@ export const gamesApiSlice = apiSlice.injectEndpoints({
 export const {
   useCreateGameMutation,
   useUpdateImageMutation,
+  useAddPlayerMutation,
   useFetchGameByIdMutation,
 } = gamesApiSlice;
