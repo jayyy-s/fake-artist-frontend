@@ -8,8 +8,8 @@ export default {
       colors: {
         "fake-yellow": {
           light: "#fffa9e",
-          DEFAULT: "#fffa9e",
-          dark: "#b3ac2b",
+          DEFAULT: "#ffeb3d",
+          dark: "#ffd83d",
         },
         "fake-pink": {
           light: "#ff98e6",
@@ -31,14 +31,14 @@ export default {
           paddingLeft: "1rem",
           paddingRight: "1rem",
           "--tw-bg-opacity": "1",
-          backgroundColor: "rgb(255 250 158 / var(--tw-bg-opacity))",
+          backgroundColor: "rgb(255 235 61 / var(--tw-bg-opacity))",
           "--tw-border-opacity": "1",
           borderColor: "rgb(0 0 0 / var(--tw-border-opacity))",
           borderRadius: "0.25rem",
           cursor: "pointer",
           "&:hover": {
-            "--tw-bg-opacity": 1,
-            backgroundColor: "rgb(179 172 43 / var(--tw-bg-opacity))",
+            "--tw-bg-opacity": "1",
+            backgroundColor: "rgb(255 216 61 / var(--tw-bg-opacity))",
           },
         },
       });
