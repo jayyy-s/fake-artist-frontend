@@ -15,6 +15,7 @@ type WebSocketData = {
   type: string;
   data: {
     canvasState?: string;
+    gameState?: string;
   };
 };
 
@@ -34,8 +35,9 @@ const DrawingBoard = () => {
   const canvas = canvasRef.current ? canvasRef.current : null;
   const context = canvas?.getContext("2d");
   const [isDrawing, setIsDrawing] = useState(false);
-  const [isDrawingTurn, setIsDrawingTurn] = useState(false);
+  // const [isDrawingTurn, setIsDrawingTurn] = useState(false);
   const [isHost, setIsHost] = useState(false);
+  const [isGameStarted, setIsGameStarted] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
   const color = "#000000"; // TODO: Let players select colors? Somehow give players different colors
   const { gameId } = useParams();
@@ -88,7 +90,7 @@ const DrawingBoard = () => {
     try {
       updateImage({ canvasState: canvas.toDataURL(), gameId }).then(() => {
         // set drawing turn to false after canvas state updated
-        setIsDrawingTurn(false);
+        // setIsDrawingTurn(false);
         sendJsonMessage({
           type: "drawLine",
           data: { gameId },
@@ -110,7 +112,10 @@ const DrawingBoard = () => {
     const clientReadyHandler = async () => {
       try {
         const game = await fetchGameById({ gameId }).unwrap();
+        // set current game state
         loadImage(context, game.canvasState);
+        setIsGameStarted(game.gameState === "active");
+
         sendJsonMessage({ type: "clientReady", data: { gameId } });
         setIsClientReady(true);
       } catch (err) {
@@ -146,8 +151,11 @@ const DrawingBoard = () => {
         case "drawCurrentCanvasState":
           handleRedrawCurrentCanvasState(context);
           break;
-        case "drawingTurn":
-          setIsDrawingTurn(true);
+        // case "drawingTurn":
+        //   setIsDrawingTurn(true);
+        //   break;
+        case "serverStartGame":
+          setIsGameStarted(true);
           break;
       }
     }
@@ -160,6 +168,10 @@ const DrawingBoard = () => {
     navigate,
   ]);
 
+  const startGameHandler = () => {
+    sendJsonMessage({ type: "hostStartGame", data: { gameId } });
+  };
+
   return (
     <div className="bg-white border border-black rounded relative overflow-hidden inline-block">
       <canvas
@@ -170,11 +182,15 @@ const DrawingBoard = () => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       />
-      <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
-        <div className="btn-fake-yellow">
-          Start Game
+      {!isGameStarted && (
+        <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
+          {isHost && (
+            <div onClick={startGameHandler} className="btn-fake-yellow">
+              Start Game
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 };
