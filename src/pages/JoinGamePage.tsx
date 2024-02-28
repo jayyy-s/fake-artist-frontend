@@ -1,25 +1,22 @@
 import { ChangeEvent, MouseEvent, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useCreateGameMutation } from "../slices/gamesApiSice";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setPlayerUsername } from "../slices/playerSlice";
 
-const StartGamePage = () => {
+const JoinGamePage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [createGame] = useCreateGameMutation();
+  const { gameId } = useParams();
 
   const [username, setUsername] = useState("");
 
-  const handleCreateGame = async (e: MouseEvent<HTMLDivElement>) => {
+  const handleJoinGame = async (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     if (!username) return; // TODO: UX for no username
     try {
-      const res = await createGame({}).unwrap();
-      const { gameId } = res;
       dispatch(setPlayerUsername({ username }));
-      navigate(`game/${gameId}`);
+      navigate(`/game/${gameId}`);
     } catch (err) {
       const e = err as Error;
       console.log(e?.message);
@@ -38,12 +35,12 @@ const StartGamePage = () => {
           className="border border-black mb-4 py-2 px-4"
           required
         />
-        <div className="btn-fake-yellow" onClick={handleCreateGame}>
-          Create Game
+        <div className="btn-fake-yellow" onClick={handleJoinGame}>
+          Join Game
         </div>
       </div>
     </div>
   );
 };
 
-export default StartGamePage;
+export default JoinGamePage;

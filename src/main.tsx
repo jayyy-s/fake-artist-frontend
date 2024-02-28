@@ -12,12 +12,14 @@ import {
 } from "react-router-dom";
 import store from "./store.ts";
 import { Provider } from "react-redux";
+import JoinGamePage from "./pages/JoinGamePage.tsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
       <Route index={true} path="/" element={<StartGamePage />} />
       <Route path="/game/:gameId" element={<GamePage />} />
+      <Route path="/join/:gameId" element={<JoinGamePage />} />
     </Route>
   )
 );

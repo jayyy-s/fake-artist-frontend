@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
 import { drawLine } from "../utils/drawLine";
 import useWebSocket from "react-use-websocket";
 import { useParams, useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import {
   useUpdateImageMutation,
   useFetchGameByIdMutation,
 } from "../slices/gamesApiSice";
+import { useSelector } from "react-redux";
 
 const WS_URL = "ws://localhost:5000";
 const CANVAS_WIDTH = 800;
@@ -16,6 +17,12 @@ type WebSocketData = {
   data: {
     canvasState?: string;
     gameState?: string;
+  };
+};
+
+type PlayerState = {
+  player: {
+    username: string;
   };
 };
 
@@ -35,10 +42,11 @@ const DrawingBoard = () => {
   const canvas = canvasRef.current ? canvasRef.current : null;
   const context = canvas?.getContext("2d");
   const [isDrawing, setIsDrawing] = useState(false);
-  // const [isDrawingTurn, setIsDrawingTurn] = useState(false);
+  const [isDrawingTurn, setIsDrawingTurn] = useState(false);
   const [isHost, setIsHost] = useState(false);
   const [isGameStarted, setIsGameStarted] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
+
   const color = "#000000"; // TODO: Let players select colors? Somehow give players different colors
   const { gameId } = useParams();
 
@@ -47,17 +55,21 @@ const DrawingBoard = () => {
   const [updateImage] = useUpdateImageMutation();
   const [fetchGameById] = useFetchGameByIdMutation();
 
-  // ISSUE: Establsihing ws connection before I know the game exists
+  const { username } = useSelector((state: PlayerState) => state.player);
+  if (!username) {
+    navigate("/");
+  }
+
   const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
     WS_URL,
     { share: true }
   );
 
   // Handle mouse down (allow to draw line)
-  const handleMouseDown = (
-    e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ): void => {
+  const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>): void => {
     e.preventDefault();
+    if (!isDrawingTurn) return;
+
     setIsDrawing(true);
     setPreviousPosition({
       x: e.nativeEvent.offsetX,
@@ -65,11 +77,9 @@ const DrawingBoard = () => {
     });
   };
 
-  const handleMouseMove = (
-    e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ): void => {
+  const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    if (!isDrawing || !canvas || !context) return;
+    if (!isDrawing || !canvas || !context || !isDrawingTurn) return;
 
     const currentPosition: Point = {
       x: e.nativeEvent.offsetX,
@@ -81,16 +91,14 @@ const DrawingBoard = () => {
     setPreviousPosition(currentPosition);
   };
 
-  const handleMouseUp = (
-    e: React.MouseEvent<HTMLCanvasElement, MouseEvent>
-  ) => {
+  const handleMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
     e.preventDefault();
-    if (!canvas) return;
+    if (!canvas || !isDrawingTurn) return;
 
     try {
       updateImage({ canvasState: canvas.toDataURL(), gameId }).then(() => {
         // set drawing turn to false after canvas state updated
-        // setIsDrawingTurn(false);
+        setIsDrawingTurn(false);
         sendJsonMessage({
           type: "drawLine",
           data: { gameId },
@@ -116,7 +124,7 @@ const DrawingBoard = () => {
         loadImage(context, game.canvasState);
         setIsGameStarted(game.gameState === "active");
 
-        sendJsonMessage({ type: "clientReady", data: { gameId } });
+        sendJsonMessage({ type: "clientReady", data: { gameId, username } });
         setIsClientReady(true);
       } catch (err) {
         // if game not found (or something else went wrong) go back to the home page
@@ -151,9 +159,9 @@ const DrawingBoard = () => {
         case "drawCurrentCanvasState":
           handleRedrawCurrentCanvasState(context);
           break;
-        // case "drawingTurn":
-        //   setIsDrawingTurn(true);
-        //   break;
+        case "drawingTurn":
+          setIsDrawingTurn(true);
+          break;
         case "serverStartGame":
           setIsGameStarted(true);
           break;
@@ -166,6 +174,7 @@ const DrawingBoard = () => {
     sendJsonMessage,
     fetchGameById,
     navigate,
+    username,
   ]);
 
   const startGameHandler = () => {
@@ -184,11 +193,13 @@ const DrawingBoard = () => {
       />
       {!isGameStarted && (
         <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
-          {isHost && (
-            <div onClick={startGameHandler} className="btn-fake-yellow">
-              Start Game
-            </div>
-          )}
+          <div className="flex flex-col items-center justify-center w-72 h-36 bg-slate-50 border rounded-md border-black">
+            {isHost && (
+              <div onClick={startGameHandler} className="btn-fake-yellow">
+                Start Game
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
