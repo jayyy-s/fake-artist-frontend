@@ -8,11 +8,11 @@ import {
 } from "../slices/gamesApiSice";
 import { useSelector } from "react-redux";
 
-const WS_URL = "ws://localhost:5000";
+const WS_URL = import.meta.env.VITE_WS_URL!;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 
-type WebSocketData = {
+type DrawingBoardWebSocketData = {
   type: string;
   data: {
     canvasState?: string;
@@ -60,10 +60,8 @@ const DrawingBoard = () => {
     navigate("/");
   }
 
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
-    WS_URL,
-    { share: true }
-  );
+  const { sendJsonMessage, lastJsonMessage } =
+    useWebSocket<DrawingBoardWebSocketData>(WS_URL, { share: true });
 
   // Handle mouse down (allow to draw line)
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>): void => {
@@ -193,13 +191,13 @@ const DrawingBoard = () => {
       />
       {!isGameStarted && (
         <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
-          <div className="flex flex-col items-center justify-center w-72 h-36 bg-slate-50 border rounded-md border-black">
-            {isHost && (
+          {isHost && (
+            <div className="flex flex-col items-center justify-center w-72 h-36 bg-slate-50 border rounded-md border-black">
               <div onClick={startGameHandler} className="btn-fake-yellow">
                 Start Game
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>
