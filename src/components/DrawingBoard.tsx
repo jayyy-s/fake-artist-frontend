@@ -1,29 +1,16 @@
 import { MouseEvent, useEffect, useRef, useState } from "react";
 import { drawLine } from "../utils/drawLine";
 import useWebSocket from "react-use-websocket";
-import { useParams, useNavigate } from "react-router-dom";
-import {
-  useUpdateImageMutation,
-  useFetchGameByIdMutation,
-} from "../slices/gamesApiSice";
+import { useParams } from "react-router-dom";
+import { useUpdateImageMutation } from "../slices/gamesApiSice";
 import { useSelector } from "react-redux";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
 
-type DrawingBoardWebSocketData = {
-  type: string;
-  data: {
-    canvasState?: string;
-    gameState?: string;
-  };
-};
-
-type PlayerState = {
-  player: {
-    username: string;
-  };
+type DrawingBoardProps = {
+  isGameStarted: boolean;
 };
 
 // copy lines drawn from other clients
@@ -36,29 +23,21 @@ const createLine = (
   drawLine(context, prevPosition, currentPosition, color);
 };
 
-const DrawingBoard = () => {
-  const [isClientReady, setIsClientReady] = useState(false);
+const DrawingBoard = (props: DrawingBoardProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current ? canvasRef.current : null;
   const context = canvas?.getContext("2d");
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDrawingTurn, setIsDrawingTurn] = useState(false);
   const [isHost, setIsHost] = useState(false);
-  const [isGameStarted, setIsGameStarted] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
 
   const color = "#000000"; // TODO: Let players select colors? Somehow give players different colors
   const { gameId } = useParams();
 
-  const navigate = useNavigate();
-
   const [updateImage] = useUpdateImageMutation();
-  const [fetchGameById] = useFetchGameByIdMutation();
 
-  const { username } = useSelector((state: PlayerState) => state.player);
-  if (!username) {
-    navigate("/");
-  }
+  const { canvasState } = useSelector((state: GameState) => state.gameState);
 
   const { sendJsonMessage, lastJsonMessage } =
     useWebSocket<DrawingBoardWebSocketData>(WS_URL, { share: true });
@@ -115,25 +94,6 @@ const DrawingBoard = () => {
     const context = canvas?.getContext("2d");
     if (!context) return;
 
-    const clientReadyHandler = async () => {
-      try {
-        const game = await fetchGameById({ gameId }).unwrap();
-        // set current game state
-        loadImage(context, game.canvasState);
-        setIsGameStarted(game.gameState === "active");
-
-        sendJsonMessage({ type: "clientReady", data: { gameId, username } });
-        setIsClientReady(true);
-      } catch (err) {
-        // if game not found (or something else went wrong) go back to the home page
-        navigate("/");
-      }
-    };
-
-    if (!isClientReady) {
-      clientReadyHandler();
-    }
-
     const loadImage = (ctx: CanvasRenderingContext2D, imageSrc: string) => {
       const image = new Image();
       image.src = imageSrc;
@@ -142,38 +102,19 @@ const DrawingBoard = () => {
       };
     };
 
-    const handleRedrawCurrentCanvasState = (ctx: CanvasRenderingContext2D) => {
-      const { canvasState } = lastJsonMessage.data;
-      if (!canvasState) return;
-
-      loadImage(ctx, canvasState);
-    };
+    loadImage(context, canvasState);
 
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
         case "setHostClient":
           setIsHost(true);
           break;
-        case "drawCurrentCanvasState":
-          handleRedrawCurrentCanvasState(context);
-          break;
         case "drawingTurn":
           setIsDrawingTurn(true);
           break;
-        case "serverStartGame":
-          setIsGameStarted(true);
-          break;
       }
     }
-  }, [
-    isClientReady,
-    lastJsonMessage,
-    gameId,
-    sendJsonMessage,
-    fetchGameById,
-    navigate,
-    username,
-  ]);
+  }, [lastJsonMessage, canvasState]);
 
   const startGameHandler = () => {
     sendJsonMessage({ type: "hostStartGame", data: { gameId } });
@@ -189,7 +130,7 @@ const DrawingBoard = () => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       />
-      {!isGameStarted && (
+      {!props.isGameStarted && (
         <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
           {isHost && (
             <div className="flex flex-col items-center justify-center w-72 h-36 bg-slate-50 border rounded-md border-black">
