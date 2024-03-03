@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import useWebSocket from "react-use-websocket";
 import { useDispatch, useSelector } from "react-redux";
-import { setCanvasState } from "../slices/gameStateSlice";
+import { setCanvasState, setCurrentArtist } from "../slices/gameStateSlice";
 import { useFetchGameByIdMutation } from "../slices/gamesApiSice";
 import { useEffect, useState } from "react";
 
@@ -17,6 +17,13 @@ const GameScreen = () => {
     try {
       const game = await fetchGameById({ gameId }).unwrap();
       dispatch(setCanvasState({ canvasState: game.canvasState }));
+      if (game.currentArtist) {
+        dispatch(
+          setCurrentArtist({
+            currentArtist: game.currentArtist,
+          })
+        );
+      }
 
       setIsGameStarted(game.gameState === "active");
 

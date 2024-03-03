@@ -1,21 +1,10 @@
 import { useEffect, useState } from "react";
 import useWebSocket from "react-use-websocket";
 import PlayerListItem from "./PlayerListItem";
+import { useSelector, useDispatch } from "react-redux";
+import { setCurrentArtist } from "../../slices/gameStateSlice";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
-
-type PlayersWebSocketData = {
-  type: string;
-  data: {
-    players?: Player[];
-    currentArtist?: Player;
-  };
-};
-
-type Player = {
-  username: string;
-  id: number;
-};
 
 // ISSUE: Players disconnecting on their turn messes up turn order (stuck)
 
@@ -24,11 +13,11 @@ const PlayerList = () => {
     share: true,
   });
 
+  const dispatch = useDispatch();
+
   const [players, setPlayers] = useState<Player[]>([]);
-  const [currentArtist, setCurrentArtist] = useState<Player>({
-    username: "",
-    id: 0,
-  });
+
+  const { currentArtist } = useSelector((state: GameState) => state.gameState);
 
   useEffect(() => {
     if (lastJsonMessage) {
@@ -39,19 +28,23 @@ const PlayerList = () => {
           break;
         case "setCurrentArtist":
           if (!lastJsonMessage.data.currentArtist) return;
-          console.log(lastJsonMessage.data.currentArtist);
-          setCurrentArtist(lastJsonMessage.data.currentArtist);
+          dispatch(
+            setCurrentArtist({
+              currentArtist: lastJsonMessage.data.currentArtist,
+            })
+          );
           break;
       }
     }
-  }, [currentArtist, lastJsonMessage]);
+  }, [currentArtist, dispatch, lastJsonMessage]);
 
   return (
     <div className="flex flex-col">
       {players.map((p) => (
         <PlayerListItem
           username={p.username}
-          isCurrentArtist={currentArtist.username === p.username}
+          isCurrentArtist={currentArtist && currentArtist.id === p.id}
+          key={p.id}
         />
       ))}
     </div>

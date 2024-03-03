@@ -8,6 +8,14 @@ type Draw = {
   currentPosition: Point;
 };
 
+type PlayersWebSocketData = {
+  type: string;
+  data: {
+    players?: Player[];
+    currentArtist?: Player;
+  };
+};
+
 type DrawingBoardWebSocketData = {
   type: string;
   data: {
@@ -16,9 +24,14 @@ type DrawingBoardWebSocketData = {
   };
 };
 
+type Player = {
+  username: string;
+  id: number;
+};
+
 type GameState = {
   gameState: {
-    currentArtist: string;
+    currentArtist: Player;
     questionMaster: string;
     canvasState: string;
   };

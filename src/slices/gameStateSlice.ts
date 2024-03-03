@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  currentArtist: "",
-  questionMaster: "",
+  currentArtist: null,
+  questionMaster: null,
   canvasState: "",
 };
 
