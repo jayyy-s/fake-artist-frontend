@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import DrawingBoard from "../components/DrawingBoard";
+import DrawingBoard from "../components/DrawingBoard/DrawingBoard";
 import PlayerList from "../components/PlayerList/PlayerList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
@@ -7,7 +7,9 @@ import useWebSocket from "react-use-websocket";
 import { useDispatch, useSelector } from "react-redux";
 import { setCanvasState, setCurrentArtist } from "../slices/gameStateSlice";
 import { useFetchGameByIdMutation } from "../slices/gamesApiSice";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { setIsGameStarted } from "../slices/clientStateSlice";
+import GamePrompt from "../components/GamePrompt";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const BASE_URL = "localhost:3000";
@@ -25,7 +27,9 @@ const GameScreen = () => {
         );
       }
 
-      setIsGameStarted(game.gameState === "active");
+      dispatch(
+        setIsGameStarted({ isGameStarted: game.gameState === "active" })
+      );
 
       sendJsonMessage({ type: "clientReady", data: { gameId, username } });
     } catch (err) {
@@ -39,8 +43,6 @@ const GameScreen = () => {
       share: true,
       onOpen: clientReadyHandler,
     });
-
-  const [isGameStarted, setIsGameStarted] = useState(false);
 
   const { gameId } = useParams();
   const joinGameUrl = `${BASE_URL}/join/${gameId}`;
@@ -62,7 +64,7 @@ const GameScreen = () => {
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
         case "serverStartGame":
-          setIsGameStarted(true);
+          dispatch(setIsGameStarted({ isGameStarted: true }));
           break;
         case "drawCurrentCanvasState":
           dispatch(
@@ -78,7 +80,7 @@ const GameScreen = () => {
       <div>A Fake Artist</div>
       <div className="flex">
         <div className="flex flex-col mr-4">
-          <DrawingBoard isGameStarted={isGameStarted} />
+          <DrawingBoard />
           <div
             onClick={copyUrl}
             className="border rounded-md border-black mt-4 py-2 px-4 cursor-pointer flex items-center justify-center"
@@ -87,7 +89,10 @@ const GameScreen = () => {
             <FontAwesomeIcon icon={faCopy} />
           </div>
         </div>
-        <PlayerList />
+        <div className="flex flex-col">
+          <GamePrompt />
+          <PlayerList />
+        </div>
       </div>
     </div>
   );

@@ -24,6 +24,14 @@ type DrawingBoardWebSocketData = {
   };
 };
 
+type PromptWebSocketData = {
+  type: string;
+  data: {
+    category: string;
+    title: string;
+  };
+};
+
 type Player = {
   username: string;
   id: number;
@@ -33,6 +41,7 @@ type GameState = {
   gameState: {
     currentArtist: Player;
     questionMaster: string;
+    isPromptSet: boolean;
     canvasState: string;
   };
 };
@@ -40,5 +49,14 @@ type GameState = {
 type PlayerState = {
   player: {
     username: string;
+  };
+};
+
+type ClientState = {
+  clientState: {
+    isHost: boolean;
+    isQuestionMaster: boolean;
+    isFakeArtist: boolean;
+    isGameStarted: boolean;
   };
 };

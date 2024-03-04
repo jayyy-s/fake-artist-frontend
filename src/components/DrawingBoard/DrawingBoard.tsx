@@ -1,17 +1,17 @@
 import { MouseEvent, useEffect, useRef, useState } from "react";
-import { drawLine } from "../utils/drawLine";
+import { drawLine } from "../../utils/drawLine";
 import useWebSocket from "react-use-websocket";
 import { useParams } from "react-router-dom";
-import { useUpdateImageMutation } from "../slices/gamesApiSice";
-import { useSelector } from "react-redux";
+import {
+  useUpdateImageMutation,
+} from "../../slices/gamesApiSice";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsHost, setIsQuestionMaster } from "../../slices/clientStateSlice";
+import DrawingBoardOverlay from "./DrawingBoardOverlay";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
-
-type DrawingBoardProps = {
-  isGameStarted: boolean;
-};
 
 // copy lines drawn from other clients
 const createLine = (
@@ -23,13 +23,12 @@ const createLine = (
   drawLine(context, prevPosition, currentPosition, color);
 };
 
-const DrawingBoard = (props: DrawingBoardProps) => {
+const DrawingBoard = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const canvas = canvasRef.current ? canvasRef.current : null;
   const context = canvas?.getContext("2d");
   const [isDrawing, setIsDrawing] = useState(false);
   const [isDrawingTurn, setIsDrawingTurn] = useState(false);
-  const [isHost, setIsHost] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
 
   const color = "#000000"; // TODO: Let players select colors? Somehow give players different colors
@@ -37,7 +36,14 @@ const DrawingBoard = (props: DrawingBoardProps) => {
 
   const [updateImage] = useUpdateImageMutation();
 
-  const { canvasState } = useSelector((state: GameState) => state.gameState);
+  const dispatch = useDispatch();
+
+  const { canvasState, isPromptSet } = useSelector((state: GameState) => state.gameState);
+
+  const { isGameStarted, isQuestionMaster } = useSelector(
+    (state: ClientState) => state.clientState
+  );
+
 
   const { sendJsonMessage, lastJsonMessage } =
     useWebSocket<DrawingBoardWebSocketData>(WS_URL, { share: true });
@@ -107,18 +113,17 @@ const DrawingBoard = (props: DrawingBoardProps) => {
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
         case "setHostClient":
-          setIsHost(true);
+          dispatch(setIsHost({ isHost: true }));
           break;
         case "drawingTurn":
           setIsDrawingTurn(true);
           break;
+        case "promptQuestionMaster":
+          dispatch(setIsQuestionMaster({ isQuestionMaster: true }));
+          break;
       }
     }
-  }, [lastJsonMessage, canvasState]);
-
-  const startGameHandler = () => {
-    sendJsonMessage({ type: "hostStartGame", data: { gameId } });
-  };
+  }, [lastJsonMessage, canvasState, dispatch]);
 
   return (
     <div className="bg-white border border-black rounded relative overflow-hidden inline-block">
@@ -130,16 +135,8 @@ const DrawingBoard = (props: DrawingBoardProps) => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       />
-      {!props.isGameStarted && (
-        <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
-          {isHost && (
-            <div className="flex flex-col items-center justify-center w-72 h-36 bg-slate-50 border rounded-md border-black">
-              <div onClick={startGameHandler} className="btn-fake-yellow">
-                Start Game
-              </div>
-            </div>
-          )}
-        </div>
+      {(!isGameStarted || (isQuestionMaster && !isPromptSet)) && (
+        <DrawingBoardOverlay />
       )}
     </div>
   );

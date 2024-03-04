@@ -8,7 +8,7 @@ const PlayerListItem = (props: PlayerListItemProps) => {
 
   return (
     <div
-      className={`border rounded-md border-black ${bgColor} items-center justify-center py-2 px-4 mb-2 w-40`}
+      className={`border rounded-md border-black ${bgColor} items-center justify-center py-2 px-4 mb-2 w-52`}
     >
       {props.username}
     </div>
