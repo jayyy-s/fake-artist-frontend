@@ -1,8 +1,9 @@
-import { ChangeEvent, MouseEvent, useState } from "react";
+import { ChangeEvent, MouseEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCreateGameMutation } from "../slices/gamesApiSice";
 import { useDispatch } from "react-redux";
 import { setPlayerUsername } from "../slices/playerSlice";
+import { setCanvasState } from "../slices/gameStateSlice";
 
 const StartGamePage = () => {
   const navigate = useNavigate();
@@ -25,6 +26,11 @@ const StartGamePage = () => {
       console.log(e?.message);
     }
   };
+
+  // reset canvas state when on start game page
+  useEffect(() => {
+    dispatch(setCanvasState({ canvasState: "" }));
+  }, [dispatch]);
 
   const handleUsernameInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);

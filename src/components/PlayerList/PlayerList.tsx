@@ -9,7 +9,7 @@ const WS_URL = import.meta.env.VITE_WS_URL!;
 // ISSUE: Players disconnecting on their turn messes up turn order (stuck)
 
 const PlayerList = () => {
-  const { lastJsonMessage } = useWebSocket<PlayersWebSocketData>(WS_URL, {
+  const { lastJsonMessage } = useWebSocket<WebSocketDate>(WS_URL, {
     share: true,
   });
 

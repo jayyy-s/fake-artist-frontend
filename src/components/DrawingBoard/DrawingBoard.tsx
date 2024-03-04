@@ -46,7 +46,7 @@ const DrawingBoard = () => {
 
 
   const { sendJsonMessage, lastJsonMessage } =
-    useWebSocket<DrawingBoardWebSocketData>(WS_URL, { share: true });
+    useWebSocket<WebSocketDate>(WS_URL, { share: true });
 
   // Handle mouse down (allow to draw line)
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>): void => {

@@ -8,29 +8,18 @@ type Draw = {
   currentPosition: Point;
 };
 
-type PlayersWebSocketData = {
+type WebSocketDate = {
   type: string;
   data: {
     players?: Player[];
     currentArtist?: Player;
-  };
-};
-
-type DrawingBoardWebSocketData = {
-  type: string;
-  data: {
+    questionMaster?: Player;
     canvasState?: string;
     gameState?: string;
-  };
-};
-
-type PromptWebSocketData = {
-  type: string;
-  data: {
-    category: string;
-    title: string;
-  };
-};
+    category?: string;
+    title?: string;
+  }
+}
 
 type Player = {
   username: string;
@@ -40,7 +29,7 @@ type Player = {
 type GameState = {
   gameState: {
     currentArtist: Player;
-    questionMaster: string;
+    questionMaster: Player;
     isPromptSet: boolean;
     canvasState: string;
   };

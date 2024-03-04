@@ -5,11 +5,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import useWebSocket from "react-use-websocket";
 import { useDispatch, useSelector } from "react-redux";
-import { setCanvasState, setCurrentArtist } from "../slices/gameStateSlice";
+import {
+  setCanvasState,
+  setCurrentArtist,
+  setQuestionMaster,
+} from "../slices/gameStateSlice";
 import { useFetchGameByIdMutation } from "../slices/gamesApiSice";
 import { useEffect } from "react";
 import { setIsGameStarted } from "../slices/clientStateSlice";
-import GamePrompt from "../components/GamePrompt";
+import GameInformation from "../components/GameInformation";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const BASE_URL = "localhost:3000";
@@ -27,6 +31,14 @@ const GameScreen = () => {
         );
       }
 
+      if (game.questionMaster) {
+        dispatch(
+          setQuestionMaster({
+            questionMaster: lastJsonMessage.data.questionMaster,
+          })
+        );
+      }
+
       dispatch(
         setIsGameStarted({ isGameStarted: game.gameState === "active" })
       );
@@ -38,11 +50,13 @@ const GameScreen = () => {
     }
   };
 
-  const { sendJsonMessage, lastJsonMessage } =
-    useWebSocket<DrawingBoardWebSocketData>(WS_URL, {
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketDate>(
+    WS_URL,
+    {
       share: true,
       onOpen: clientReadyHandler,
-    });
+    }
+  );
 
   const { gameId } = useParams();
   const joinGameUrl = `${BASE_URL}/join/${gameId}`;
@@ -65,6 +79,11 @@ const GameScreen = () => {
       switch (lastJsonMessage.type) {
         case "serverStartGame":
           dispatch(setIsGameStarted({ isGameStarted: true }));
+          dispatch(
+            setQuestionMaster({
+              questionMaster: lastJsonMessage.data.questionMaster,
+            })
+          );
           break;
         case "drawCurrentCanvasState":
           dispatch(
@@ -90,7 +109,7 @@ const GameScreen = () => {
           </div>
         </div>
         <div className="flex flex-col">
-          <GamePrompt />
+          <GameInformation />
           <PlayerList />
         </div>
       </div>
