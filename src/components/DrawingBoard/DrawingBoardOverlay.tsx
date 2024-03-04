@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useUpdatePromptMutation } from "../../slices/gamesApiSice";
 import useWebSocket from "react-use-websocket";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,14 +8,19 @@ import { setIsPromptSet } from "../../slices/gameStateSlice";
 const WS_URL = import.meta.env.VITE_WS_URL!;
 
 const DrawingBoardOverlay = () => {
-  const { sendJsonMessage } = useWebSocket<WebSocketDate>(WS_URL, {
-    share: true,
-  });
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketDate>(
+    WS_URL,
+    {
+      share: true,
+    }
+  );
 
   const dispatch = useDispatch();
 
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { gameId } = useParams();
 
@@ -44,13 +49,24 @@ const DrawingBoardOverlay = () => {
     });
   };
 
+  useEffect(() => {
+    if (lastJsonMessage) {
+      switch (lastJsonMessage.type) {
+        case "notEnoughPlayers":
+          setErrorMessage("Need at least 4 players to start");
+          break;
+      }
+    }
+  }, [lastJsonMessage]);
+
   return (
     <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
       {isHost && !isGameStarted && (
-        <div className="flex flex-col items-center justify-center w-72 h-36 bg-slate-50 border rounded-md border-black">
+        <div className="flex flex-col items-center justify-center relative w-72 h-36 bg-slate-50 border rounded-md border-black">
           <div onClick={startGameHandler} className="btn-fake-yellow">
             Start Game
           </div>
+          {errorMessage && <span className="text-red-600 absolute bottom-3">{errorMessage}</span>}
         </div>
       )}
       {isQuestionMaster && isGameStarted && !isPromptSet && (
