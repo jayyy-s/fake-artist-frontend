@@ -1,4 +1,4 @@
-export const drawLine = (
+const drawLine = (
   context: CanvasRenderingContext2D,
   prevPosition: Point,
   currentPosition: Point,
@@ -19,3 +19,5 @@ export const drawLine = (
   context.arc(startPoint.x, startPoint.y, 2, 0, 2 * Math.PI);
   context.fill();
 };
+
+export { drawLine };

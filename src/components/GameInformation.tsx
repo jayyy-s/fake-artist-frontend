@@ -6,7 +6,7 @@ import { setIsPromptSet } from "../slices/gameStateSlice";
 const WS_URL = import.meta.env.VITE_WS_URL!;
 
 const GameInformation = () => {
-  const { lastJsonMessage } = useWebSocket<WebSocketDate>(WS_URL, {
+  const { lastJsonMessage } = useWebSocket<WebSocketData>(WS_URL, {
     share: true,
   });
 

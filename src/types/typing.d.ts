@@ -8,7 +8,7 @@ type Draw = {
   currentPosition: Point;
 };
 
-type WebSocketDate = {
+type WebSocketData = {
   type: string;
   data: {
     players?: Player[];
@@ -18,12 +18,14 @@ type WebSocketDate = {
     gameState?: string;
     category?: string;
     title?: string;
+    color?: string;
   }
 }
 
 type Player = {
   username: string;
   id: number;
+  color: string;
 };
 
 type GameState = {

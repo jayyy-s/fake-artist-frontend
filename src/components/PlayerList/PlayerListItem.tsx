@@ -1,14 +1,16 @@
 type PlayerListItemProps = {
   username: string;
+  color: string;
   isCurrentArtist: boolean;
 };
 
 const PlayerListItem = (props: PlayerListItemProps) => {
-  const bgColor = props.isCurrentArtist ? "bg-fake-yellow" : "bg-slate-50";
+  const outline = props.isCurrentArtist ? "border-black border-2" : "";
 
   return (
     <div
-      className={`border rounded-md border-black ${bgColor} items-center justify-center py-2 px-4 mb-2 w-52`}
+      className={`rounded-md ${outline} bg-slate-50 font-bold items-center justify-center py-2 px-4 mb-2 w-52`}
+      style={{ color: props.color }}
     >
       {props.username}
     </div>

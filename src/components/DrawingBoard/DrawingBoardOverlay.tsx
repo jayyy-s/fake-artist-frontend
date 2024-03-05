@@ -8,7 +8,7 @@ import { setIsPromptSet } from "../../slices/gameStateSlice";
 const WS_URL = import.meta.env.VITE_WS_URL!;
 
 const DrawingBoardOverlay = () => {
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketDate>(
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
     WS_URL,
     {
       share: true,

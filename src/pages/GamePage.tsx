@@ -50,7 +50,7 @@ const GameScreen = () => {
     }
   };
 
-  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketDate>(
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
     WS_URL,
     {
       share: true,

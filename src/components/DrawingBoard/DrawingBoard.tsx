@@ -2,9 +2,7 @@ import { MouseEvent, useEffect, useRef, useState } from "react";
 import { drawLine } from "../../utils/drawLine";
 import useWebSocket from "react-use-websocket";
 import { useParams } from "react-router-dom";
-import {
-  useUpdateImageMutation,
-} from "../../slices/gamesApiSice";
+import { useUpdateImageMutation } from "../../slices/gamesApiSice";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsHost, setIsQuestionMaster } from "../../slices/clientStateSlice";
 import DrawingBoardOverlay from "./DrawingBoardOverlay";
@@ -31,22 +29,25 @@ const DrawingBoard = () => {
   const [isDrawingTurn, setIsDrawingTurn] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
 
-  const color = "#000000"; // TODO: Let players select colors? Somehow give players different colors
+  const [color, setColor] = useState("#000000");
   const { gameId } = useParams();
 
   const [updateImage] = useUpdateImageMutation();
 
   const dispatch = useDispatch();
 
-  const { canvasState, isPromptSet } = useSelector((state: GameState) => state.gameState);
+  const { canvasState, isPromptSet } = useSelector(
+    (state: GameState) => state.gameState
+  );
 
   const { isGameStarted, isQuestionMaster } = useSelector(
     (state: ClientState) => state.clientState
   );
 
-
-  const { sendJsonMessage, lastJsonMessage } =
-    useWebSocket<WebSocketDate>(WS_URL, { share: true });
+  const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
+    WS_URL,
+    { share: true }
+  );
 
   // Handle mouse down (allow to draw line)
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>): void => {
@@ -120,6 +121,10 @@ const DrawingBoard = () => {
           break;
         case "promptQuestionMaster":
           dispatch(setIsQuestionMaster({ isQuestionMaster: true }));
+          break;
+        case "setPlayerColor":
+          if (!lastJsonMessage.data.color) return;
+          setColor(lastJsonMessage.data.color);
           break;
       }
     }
