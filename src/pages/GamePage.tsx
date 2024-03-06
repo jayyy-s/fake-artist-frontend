@@ -16,7 +16,7 @@ import { setIsGameStarted } from "../slices/clientStateSlice";
 import GameInformation from "../components/GameInformation";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
-const BASE_URL = "localhost:3000";
+const BASE_URL = import.meta.env.VITE_BASE_URL!;
 
 const GameScreen = () => {
   const clientReadyHandler = async () => {
