@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import useWebSocket from "react-use-websocket";
 import { setIsPromptSet } from "../slices/gameStateSlice";
+import { GameState } from "../types/sliceStateTypes";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 

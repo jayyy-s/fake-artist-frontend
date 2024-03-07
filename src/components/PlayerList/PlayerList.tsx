@@ -3,10 +3,10 @@ import useWebSocket from "react-use-websocket";
 import PlayerListItem from "./PlayerListItem";
 import { useSelector, useDispatch } from "react-redux";
 import { setCurrentArtist } from "../../slices/gameStateSlice";
+import { GameState } from "../../types/sliceStateTypes";
+import { gamePhases } from "../../types/enums";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
-
-// ISSUE: Players disconnecting on their turn messes up turn order (stuck)
 
 const PlayerList = () => {
   const { lastJsonMessage } = useWebSocket<WebSocketData>(WS_URL, {
@@ -17,7 +17,7 @@ const PlayerList = () => {
 
   const [players, setPlayers] = useState<Player[]>([]);
 
-  const { currentArtist } = useSelector((state: GameState) => state.gameState);
+  const { currentArtist, gamePhase } = useSelector((state: GameState) => state.gameState);
 
   useEffect(() => {
     if (lastJsonMessage) {
@@ -44,7 +44,7 @@ const PlayerList = () => {
         <PlayerListItem
           username={p.username}
           color={p.color}
-          isCurrentArtist={currentArtist && currentArtist.id === p.id}
+          isCurrentArtist={gamePhase === gamePhases.active && currentArtist && currentArtist.id === p.id}
           key={p.id}
         />
       ))}

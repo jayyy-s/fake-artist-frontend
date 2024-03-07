@@ -4,7 +4,6 @@ const initialState = {
   isHost: false,
   isQuestionMaster: false,
   isFakeArtist: false,
-  isGameStarted: false,
 };
 
 const clientStateSlice = createSlice({
@@ -23,13 +22,9 @@ const clientStateSlice = createSlice({
       const { isFakeArtist } = action.payload;
       state.isFakeArtist = isFakeArtist;
     },
-    setIsGameStarted: (state, action) => {
-      const { isGameStarted } = action.payload;
-      state.isGameStarted = isGameStarted;
-    },
   },
 });
 
-export const { setIsHost, setIsQuestionMaster, setIsFakeArtist, setIsGameStarted } = clientStateSlice.actions;
+export const { setIsHost, setIsQuestionMaster, setIsFakeArtist } = clientStateSlice.actions;
 
 export default clientStateSlice.reducer;

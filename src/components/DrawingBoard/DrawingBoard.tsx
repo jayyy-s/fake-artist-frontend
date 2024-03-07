@@ -6,6 +6,8 @@ import { useUpdateImageMutation } from "../../slices/gamesApiSice";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsHost, setIsQuestionMaster } from "../../slices/clientStateSlice";
 import DrawingBoardOverlay from "./DrawingBoardOverlay";
+import { ClientState, GameState } from "../../types/sliceStateTypes";
+import { gamePhases } from "../../types/enums";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const CANVAS_WIDTH = 800;
@@ -36,11 +38,11 @@ const DrawingBoard = () => {
 
   const dispatch = useDispatch();
 
-  const { canvasState, isPromptSet } = useSelector(
+  const { canvasState, isPromptSet, gamePhase } = useSelector(
     (state: GameState) => state.gameState
   );
 
-  const { isGameStarted, isQuestionMaster } = useSelector(
+  const { isQuestionMaster } = useSelector(
     (state: ClientState) => state.clientState
   );
 
@@ -140,7 +142,7 @@ const DrawingBoard = () => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       />
-      {(!isGameStarted || (isQuestionMaster && !isPromptSet)) && (
+      {(gamePhase === gamePhases.inactive || (isQuestionMaster && !isPromptSet)) && (
         <DrawingBoardOverlay />
       )}
     </div>

@@ -27,27 +27,3 @@ type Player = {
   id: number;
   color: string;
 };
-
-type GameState = {
-  gameState: {
-    currentArtist: Player;
-    questionMaster: Player;
-    isPromptSet: boolean;
-    canvasState: string;
-  };
-};
-
-type PlayerState = {
-  player: {
-    username: string;
-  };
-};
-
-type ClientState = {
-  clientState: {
-    isHost: boolean;
-    isQuestionMaster: boolean;
-    isFakeArtist: boolean;
-    isGameStarted: boolean;
-  };
-};

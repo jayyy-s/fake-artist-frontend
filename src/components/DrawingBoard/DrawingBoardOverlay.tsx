@@ -4,6 +4,8 @@ import useWebSocket from "react-use-websocket";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { setIsPromptSet } from "../../slices/gameStateSlice";
+import { ClientState, GameState } from "../../types/sliceStateTypes";
+import { gamePhases } from "../../types/enums";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 
@@ -24,8 +26,12 @@ const DrawingBoardOverlay = () => {
 
   const { gameId } = useParams();
 
-  const { isGameStarted, isHost, isQuestionMaster } = useSelector(
+  const { isHost, isQuestionMaster } = useSelector(
     (state: ClientState) => state.clientState
+  );
+
+  const { gamePhase } = useSelector(
+    (state: GameState) => state.gameState
   );
 
   const startGameHandler = () => {
@@ -61,7 +67,7 @@ const DrawingBoardOverlay = () => {
 
   return (
     <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
-      {isHost && !isGameStarted && (
+      {isHost && gamePhase === gamePhases.inactive && (
         <div className="flex flex-col items-center justify-center relative w-72 h-36 bg-slate-50 border rounded-md border-black">
           <div onClick={startGameHandler} className="btn-fake-yellow">
             Start Game
@@ -69,7 +75,7 @@ const DrawingBoardOverlay = () => {
           {errorMessage && <span className="text-red-600 absolute bottom-3">{errorMessage}</span>}
         </div>
       )}
-      {isQuestionMaster && isGameStarted && !isPromptSet && (
+      {isQuestionMaster && gamePhase === gamePhases.active && !isPromptSet && (
         <div className="flex flex-col items-center justify-center py-5 px-5 bg-slate-50 border rounded-md border-black">
           <input
             onChange={handleCategoryInputChange}

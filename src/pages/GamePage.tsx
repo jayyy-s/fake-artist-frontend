@@ -12,8 +12,10 @@ import {
 } from "../slices/gameStateSlice";
 import { useFetchGameByIdMutation } from "../slices/gamesApiSice";
 import { useEffect } from "react";
-import { setIsGameStarted } from "../slices/clientStateSlice";
+import { setGamePhase } from "../slices/gameStateSlice";
 import GameInformation from "../components/GameInformation";
+import { PlayerState } from "../types/sliceStateTypes";
+import { gamePhases } from "../types/enums";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const BASE_URL = import.meta.env.VITE_BASE_URL!;
@@ -39,9 +41,7 @@ const GameScreen = () => {
         );
       }
 
-      dispatch(
-        setIsGameStarted({ isGameStarted: game.gameState === "active" })
-      );
+      dispatch(setGamePhase({ gamePhase: game.gameState }));
 
       sendJsonMessage({ type: "clientReady", data: { gameId, username } });
     } catch (err) {
@@ -78,7 +78,7 @@ const GameScreen = () => {
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
         case "serverStartGame":
-          dispatch(setIsGameStarted({ isGameStarted: true }));
+          dispatch(setGamePhase({ gamePhase: gamePhases.active }));
           dispatch(
             setQuestionMaster({
               questionMaster: lastJsonMessage.data.questionMaster,
@@ -90,6 +90,8 @@ const GameScreen = () => {
             setCanvasState({ canvasState: lastJsonMessage.data.canvasState })
           );
           break;
+        case "votePhase":
+          dispatch(setGamePhase({ gamePhase: gamePhases.voting }));
       }
     }
   }, [dispatch, lastJsonMessage]);

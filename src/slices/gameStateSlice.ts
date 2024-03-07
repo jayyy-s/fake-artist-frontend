@@ -1,10 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { gamePhases } from "../types/enums";
 
 const initialState = {
   currentArtist: null,
   questionMaster: null,
   isPromptSet: false,
   canvasState: "",
+  gamePhase: gamePhases.inactive,
 };
 
 const gameStateSlice = createSlice({
@@ -27,6 +29,10 @@ const gameStateSlice = createSlice({
       const { isPromptSet } = action.payload;
       state.isPromptSet = isPromptSet;
     },
+    setGamePhase: (state, action) => {
+      const { gamePhase } = action.payload;
+      state.gamePhase = gamePhase;
+    },
   },
 });
 
@@ -35,6 +41,7 @@ export const {
   setQuestionMaster,
   setCanvasState,
   setIsPromptSet,
+  setGamePhase,
 } = gameStateSlice.actions;
 
 export default gameStateSlice.reducer;
