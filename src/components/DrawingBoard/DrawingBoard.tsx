@@ -125,8 +125,8 @@ const DrawingBoard = () => {
           dispatch(setIsQuestionMaster({ isQuestionMaster: true }));
           break;
         case "setPlayerColor":
-          if (!lastJsonMessage.data.color) return;
-          setColor(lastJsonMessage.data.color);
+          if (!lastJsonMessage.data.colorCombo) return;
+          setColor(lastJsonMessage.data.colorCombo.primary);
           break;
       }
     }
@@ -142,9 +142,8 @@ const DrawingBoard = () => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       />
-      {(gamePhase === gamePhases.inactive || (isQuestionMaster && !isPromptSet)) && (
-        <DrawingBoardOverlay />
-      )}
+      {(gamePhase === gamePhases.inactive ||
+        (isQuestionMaster && !isPromptSet)) && <DrawingBoardOverlay />}
     </div>
   );
 };

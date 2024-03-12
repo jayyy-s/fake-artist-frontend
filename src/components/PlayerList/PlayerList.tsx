@@ -17,7 +17,9 @@ const PlayerList = () => {
 
   const [players, setPlayers] = useState<Player[]>([]);
 
-  const { currentArtist, gamePhase } = useSelector((state: GameState) => state.gameState);
+  const { currentArtist, gamePhase } = useSelector(
+    (state: GameState) => state.gameState
+  );
 
   useEffect(() => {
     if (lastJsonMessage) {
@@ -43,8 +45,12 @@ const PlayerList = () => {
       {players.map((p) => (
         <PlayerListItem
           username={p.username}
-          color={p.color}
-          isCurrentArtist={gamePhase === gamePhases.active && currentArtist && currentArtist.id === p.id}
+          colorCombo={p.colorCombo}
+          isCurrentArtist={
+            gamePhase === gamePhases.active &&
+            currentArtist &&
+            currentArtist.id === p.id
+          }
           key={p.id}
         />
       ))}

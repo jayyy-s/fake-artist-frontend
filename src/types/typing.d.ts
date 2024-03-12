@@ -18,12 +18,17 @@ type WebSocketData = {
     gameState?: string;
     category?: string;
     title?: string;
-    color?: string;
-  }
-}
+    colorCombo?: ColorCombo;
+  };
+};
 
 type Player = {
   username: string;
   id: number;
-  color: string;
+  colorCombo: ColorCombo;
+};
+
+type ColorCombo = {
+  primary: string;
+  secondary: string;
 };

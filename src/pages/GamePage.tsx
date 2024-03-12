@@ -100,7 +100,11 @@ const GameScreen = () => {
     <div className="px-12 py-12 h-screen flex flex-col">
       <div>A Fake Artist</div>
       <div className="flex">
-        <div className="flex flex-col mr-4">
+        <div className="flex flex-col">
+          <GameInformation />
+          <PlayerList />
+        </div>
+        <div className="flex flex-col ml-4">
           <DrawingBoard />
           <div
             onClick={copyUrl}
@@ -109,10 +113,6 @@ const GameScreen = () => {
             <div className="flex-1">{joinGameUrl}</div>
             <FontAwesomeIcon icon={faCopy} />
           </div>
-        </div>
-        <div className="flex flex-col">
-          <GameInformation />
-          <PlayerList />
         </div>
       </div>
     </div>

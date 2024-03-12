@@ -1,6 +1,8 @@
+import PenNib from "../../assets/PenNib";
+
 type PlayerListItemProps = {
   username: string;
-  color: string;
+  colorCombo: ColorCombo;
   isCurrentArtist: boolean;
 };
 
@@ -9,10 +11,16 @@ const PlayerListItem = (props: PlayerListItemProps) => {
 
   return (
     <div
-      className={`rounded-md ${outline} bg-slate-50 font-bold items-center justify-center py-2 px-4 mb-2 w-52`}
-      style={{ color: props.color }}
+      className={`rounded-md ${outline} font-bold items-center py-2 px-4 mb-2 w-62 h-12 overflow-hidden flex relative shadow-md`}
+      style={{
+        color: props.colorCombo.secondary,
+        backgroundColor: props.colorCombo.primary,
+      }}
     >
-      {props.username}
+      <div className="">{props.username}</div>
+      <div className="absolute w-14 right-[-2px] top-2">
+        <PenNib color={props.colorCombo.secondary} />
+      </div>
     </div>
   );
 };
