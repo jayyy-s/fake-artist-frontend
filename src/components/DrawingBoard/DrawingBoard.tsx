@@ -6,7 +6,11 @@ import { useUpdateImageMutation } from "../../slices/gamesApiSice";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsHost, setIsQuestionMaster } from "../../slices/clientStateSlice";
 import DrawingBoardOverlay from "./DrawingBoardOverlay";
-import { ClientState, GameState } from "../../types/sliceStateTypes";
+import {
+  ClientState,
+  GameState,
+  PlayerState,
+} from "../../types/sliceStateTypes";
 import { gamePhases } from "../../types/enums";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
@@ -31,7 +35,7 @@ const DrawingBoard = () => {
   const [isDrawingTurn, setIsDrawingTurn] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
 
-  const [color, setColor] = useState("#000000");
+  const { colorCombo } = useSelector((state: PlayerState) => state.player);
   const { gameId } = useParams();
 
   const [updateImage] = useUpdateImageMutation();
@@ -72,7 +76,7 @@ const DrawingBoard = () => {
       y: e.nativeEvent.offsetY,
     };
 
-    createLine(context, prevPosition, currentPosition, color);
+    createLine(context, prevPosition, currentPosition, colorCombo.primary);
 
     setPreviousPosition(currentPosition);
   };
@@ -124,16 +128,12 @@ const DrawingBoard = () => {
         case "promptQuestionMaster":
           dispatch(setIsQuestionMaster({ isQuestionMaster: true }));
           break;
-        case "setPlayerColor":
-          if (!lastJsonMessage.data.colorCombo) return;
-          setColor(lastJsonMessage.data.colorCombo.primary);
-          break;
       }
     }
   }, [lastJsonMessage, canvasState, dispatch]);
 
   return (
-    <div className="bg-white border border-black rounded relative overflow-hidden inline-block">
+    <div className="bg-white rounded relative overflow-hidden inline-block">
       <canvas
         ref={canvasRef}
         onMouseDown={handleMouseDown}

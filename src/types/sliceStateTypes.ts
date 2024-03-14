@@ -7,13 +7,12 @@ type GameState = {
     isPromptSet: boolean;
     canvasState: string;
     gamePhase: GamePhase;
+    players: Player[];
   };
 };
 
 type PlayerState = {
-  player: {
-    username: string;
-  };
+  player: Player;
 };
 
 type ClientState = {

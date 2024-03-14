@@ -12,10 +12,12 @@ import {
 } from "../slices/gameStateSlice";
 import { useFetchGameByIdMutation } from "../slices/gamesApiSice";
 import { useEffect } from "react";
-import { setGamePhase } from "../slices/gameStateSlice";
+import { setGamePhase, setPlayers } from "../slices/gameStateSlice";
 import GameInformation from "../components/GameInformation";
-import { PlayerState } from "../types/sliceStateTypes";
+import { GameState, PlayerState } from "../types/sliceStateTypes";
 import { gamePhases } from "../types/enums";
+import FakeArtistPoll from "../components/FakeArtistPoll";
+import { connectPlayer } from "../slices/playerSlice";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const BASE_URL = import.meta.env.VITE_BASE_URL!;
@@ -69,7 +71,10 @@ const GameScreen = () => {
   const navigate = useNavigate();
   const [fetchGameById] = useFetchGameByIdMutation();
 
-  const { username } = useSelector((state: PlayerState) => state.player);
+  const { username, id } = useSelector((state: PlayerState) => state.player);
+  const { gamePhase, questionMaster } = useSelector(
+    (state: GameState) => state.gameState
+  );
   if (!username) {
     navigate("/");
   }
@@ -77,6 +82,14 @@ const GameScreen = () => {
   useEffect(() => {
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
+        case "serverConnected":
+          dispatch(
+            connectPlayer({
+              colorCombo: lastJsonMessage.data.colorCombo,
+              id: lastJsonMessage.data.playerId,
+            })
+          );
+          break;
         case "serverStartGame":
           dispatch(setGamePhase({ gamePhase: gamePhases.active }));
           dispatch(
@@ -92,28 +105,36 @@ const GameScreen = () => {
           break;
         case "votePhase":
           dispatch(setGamePhase({ gamePhase: gamePhases.voting }));
+          break;
+        case "updatePlayers":
+          if (!lastJsonMessage.data.players) return;
+          dispatch(setPlayers({ players: lastJsonMessage.data.players }));
+          break;
       }
     }
   }, [dispatch, lastJsonMessage]);
 
   return (
     <div className="px-12 py-12 h-screen flex flex-col">
-      <div>A Fake Artist</div>
+      <div className="text-fake-white">A Fake Artist</div>
       <div className="flex">
         <div className="flex flex-col">
           <GameInformation />
           <PlayerList />
         </div>
-        <div className="flex flex-col ml-4">
+        <div className="flex flex-col mx-4">
           <DrawingBoard />
           <div
             onClick={copyUrl}
-            className="border rounded-md border-black mt-4 py-2 px-4 cursor-pointer flex items-center justify-center"
+            className="border rounded-md border-fake-white mt-4 py-2 px-4 cursor-pointer flex items-center justify-center"
           >
-            <div className="flex-1">{joinGameUrl}</div>
-            <FontAwesomeIcon icon={faCopy} />
+            <div className="flex-1 text-fake-white">{joinGameUrl}</div>
+            <FontAwesomeIcon icon={faCopy} className="text-fake-white" />
           </div>
         </div>
+        {gamePhase === gamePhases.voting && id !== questionMaster.id && (
+          <FakeArtistPoll />
+        )}
       </div>
     </div>
   );

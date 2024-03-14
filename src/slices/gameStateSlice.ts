@@ -6,6 +6,7 @@ const initialState = {
   questionMaster: null,
   isPromptSet: false,
   canvasState: "",
+  players: [],
   gamePhase: gamePhases.inactive,
 };
 
@@ -33,6 +34,10 @@ const gameStateSlice = createSlice({
       const { gamePhase } = action.payload;
       state.gamePhase = gamePhase;
     },
+    setPlayers: (state, action) => {
+      const { players } = action.payload;
+      state.players = players;
+    },
   },
 });
 
@@ -42,6 +47,7 @@ export const {
   setCanvasState,
   setIsPromptSet,
   setGamePhase,
+  setPlayers
 } = gameStateSlice.actions;
 
 export default gameStateSlice.reducer;

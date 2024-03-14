@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useWebSocket from "react-use-websocket";
 import PlayerListItem from "./PlayerListItem";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,19 +15,14 @@ const PlayerList = () => {
 
   const dispatch = useDispatch();
 
-  const [players, setPlayers] = useState<Player[]>([]);
-
-  const { currentArtist, gamePhase } = useSelector(
+  const { currentArtist, gamePhase, players } = useSelector(
     (state: GameState) => state.gameState
   );
 
   useEffect(() => {
+    console.log(currentArtist);
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
-        case "updatePlayers":
-          if (!lastJsonMessage.data.players) return;
-          setPlayers(lastJsonMessage.data.players);
-          break;
         case "setCurrentArtist":
           if (!lastJsonMessage.data.currentArtist) return;
           dispatch(
@@ -41,12 +36,12 @@ const PlayerList = () => {
   }, [currentArtist, dispatch, lastJsonMessage]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-2 pt-2 rounded border-black bg-fake-white">
       {players.map((p) => (
         <PlayerListItem
           username={p.username}
           colorCombo={p.colorCombo}
-          isCurrentArtist={
+          isSelectedArtist={
             gamePhase === gamePhases.active &&
             currentArtist &&
             currentArtist.id === p.id

@@ -33,7 +33,7 @@ const GameInformation = () => {
   }, [dispatch, lastJsonMessage]);
 
   return (
-    <div className="border rounded-md border-black bg-slate-50 items-center justify-center py-2 px-4 mb-2 w-52">
+    <div className="border rounded-md border-black bg-fake-white items-center justify-center py-2 px-4 mb-2 w-52">
       <div>Question Master: {questionMaster ? questionMaster.username : ""}</div>
       <div>Category: {category}</div>
       <div>Title: {title}</div>

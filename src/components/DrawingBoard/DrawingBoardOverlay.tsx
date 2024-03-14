@@ -68,7 +68,7 @@ const DrawingBoardOverlay = () => {
   return (
     <div className="flex items-center justify-center absolute w-full h-full inset-0 bg-black bg-opacity-20">
       {isHost && gamePhase === gamePhases.inactive && (
-        <div className="flex flex-col items-center justify-center relative w-72 h-36 bg-slate-50 border rounded-md border-black">
+        <div className="flex flex-col items-center justify-center relative w-72 h-36 bg-fake-white border rounded-md border-black">
           <div onClick={startGameHandler} className="btn-fake-yellow">
             Start Game
           </div>
@@ -76,7 +76,7 @@ const DrawingBoardOverlay = () => {
         </div>
       )}
       {isQuestionMaster && gamePhase === gamePhases.active && !isPromptSet && (
-        <div className="flex flex-col items-center justify-center py-5 px-5 bg-slate-50 border rounded-md border-black">
+        <div className="flex flex-col items-center justify-center py-5 px-5 bg-fake-white border rounded-md border-black">
           <input
             onChange={handleCategoryInputChange}
             className="border border-black mb-4 py-2 px-4"

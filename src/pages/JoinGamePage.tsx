@@ -29,7 +29,7 @@ const JoinGamePage = () => {
 
   return (
     <div className="flex justify-center items-center h-full">
-      <div className="border rounded-md border-black bg-slate-50 flex flex-col items-center justify-center w-72 h-36">
+      <div className="border rounded-md border-black bg-fake-white flex flex-col items-center justify-center w-72 h-36">
         <input
           onChange={handleUsernameInputChange}
           className="border border-black mb-4 py-2 px-4"

@@ -3,11 +3,11 @@ import PenNib from "../../assets/PenNib";
 type PlayerListItemProps = {
   username: string;
   colorCombo: ColorCombo;
-  isCurrentArtist: boolean;
+  isSelectedArtist: boolean;
 };
 
 const PlayerListItem = (props: PlayerListItemProps) => {
-  const outline = props.isCurrentArtist ? "border-black border-2" : "";
+  const outline = props.isSelectedArtist ? "border-black border-2" : "";
 
   return (
     <div

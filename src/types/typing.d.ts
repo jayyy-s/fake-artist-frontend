@@ -19,6 +19,7 @@ type WebSocketData = {
     category?: string;
     title?: string;
     colorCombo?: ColorCombo;
+    playerId?: number;
   };
 };
 
