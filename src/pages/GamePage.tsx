@@ -53,6 +53,7 @@ const GameScreen = () => {
     }
   };
 
+  console.log(WS_URL);
   const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
     WS_URL,
     {
@@ -143,7 +144,10 @@ const GameScreen = () => {
         </div>
         {gamePhase === gamePhases.voting &&
           (hasAllVoted || id !== questionMaster.id) && (
-            <FakeArtistPoll voterData={voterData} isQuestionMaster={id === questionMaster.id} />
+            <FakeArtistPoll
+              voterData={voterData}
+              isQuestionMaster={id === questionMaster.id}
+            />
           )}
       </div>
     </div>
