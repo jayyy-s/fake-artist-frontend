@@ -53,7 +53,6 @@ const GameScreen = () => {
     }
   };
 
-  console.log(WS_URL);
   const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
     WS_URL,
     {
