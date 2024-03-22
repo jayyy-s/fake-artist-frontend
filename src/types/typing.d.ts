@@ -20,6 +20,7 @@ type WebSocketData = {
     title?: string;
     colorCombo?: ColorCombo;
     playerId?: number;
+    voterData: Vote[];
   };
 };
 
@@ -27,6 +28,11 @@ type Player = {
   username: string;
   id: number;
   colorCombo: ColorCombo;
+};
+
+type PlayerVoteData = {
+  votedPlayerId: number;
+  voterIds: number[];
 };
 
 type ColorCombo = {

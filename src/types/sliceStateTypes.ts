@@ -8,6 +8,7 @@ type GameState = {
     canvasState: string;
     gamePhase: GamePhase;
     players: Player[];
+    hasAllVoted: boolean;
   };
 };
 

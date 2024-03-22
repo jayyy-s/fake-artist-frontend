@@ -20,7 +20,6 @@ const PlayerList = () => {
   );
 
   useEffect(() => {
-    console.log(currentArtist);
     if (lastJsonMessage) {
       switch (lastJsonMessage.type) {
         case "setCurrentArtist":
@@ -47,6 +46,7 @@ const PlayerList = () => {
             currentArtist.id === p.id
           }
           key={p.id}
+          variant={"list"}
         />
       ))}
     </div>

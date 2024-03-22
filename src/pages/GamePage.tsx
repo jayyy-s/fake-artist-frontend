@@ -8,15 +8,16 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setCanvasState,
   setCurrentArtist,
+  setHasAllVoted,
   setQuestionMaster,
 } from "../slices/gameStateSlice";
 import { useFetchGameByIdMutation } from "../slices/gamesApiSice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { setGamePhase, setPlayers } from "../slices/gameStateSlice";
 import GameInformation from "../components/GameInformation";
 import { GameState, PlayerState } from "../types/sliceStateTypes";
 import { gamePhases } from "../types/enums";
-import FakeArtistPoll from "../components/FakeArtistPoll";
+import FakeArtistPoll from "../components/FakeArtistPoll/FakeArtistPoll";
 import { connectPlayer } from "../slices/playerSlice";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
@@ -72,12 +73,14 @@ const GameScreen = () => {
   const [fetchGameById] = useFetchGameByIdMutation();
 
   const { username, id } = useSelector((state: PlayerState) => state.player);
-  const { gamePhase, questionMaster } = useSelector(
+  const { gamePhase, questionMaster, hasAllVoted } = useSelector(
     (state: GameState) => state.gameState
   );
   if (!username) {
     navigate("/");
   }
+
+  const [voterData, setVoterData] = useState<PlayerVoteData[]>();
 
   useEffect(() => {
     if (lastJsonMessage) {
@@ -110,6 +113,12 @@ const GameScreen = () => {
           if (!lastJsonMessage.data.players) return;
           dispatch(setPlayers({ players: lastJsonMessage.data.players }));
           break;
+        case "voterData":
+          if (lastJsonMessage.data.voterData) {
+            setVoterData(lastJsonMessage.data.voterData);
+            dispatch(setHasAllVoted({ hasAllVoted: true }));
+          }
+          break;
       }
     }
   }, [dispatch, lastJsonMessage]);
@@ -132,9 +141,10 @@ const GameScreen = () => {
             <FontAwesomeIcon icon={faCopy} className="text-fake-white" />
           </div>
         </div>
-        {gamePhase === gamePhases.voting && id !== questionMaster.id && (
-          <FakeArtistPoll />
-        )}
+        {gamePhase === gamePhases.voting &&
+          (hasAllVoted || id !== questionMaster.id) && (
+            <FakeArtistPoll voterData={voterData} isQuestionMaster={id === questionMaster.id} />
+          )}
       </div>
     </div>
   );

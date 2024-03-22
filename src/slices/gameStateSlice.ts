@@ -8,6 +8,7 @@ const initialState = {
   canvasState: "",
   players: [],
   gamePhase: gamePhases.inactive,
+  hasAllVoted: false,
 };
 
 const gameStateSlice = createSlice({
@@ -38,6 +39,10 @@ const gameStateSlice = createSlice({
       const { players } = action.payload;
       state.players = players;
     },
+    setHasAllVoted: (state, action) => {
+      const { hasAllVoted } = action.payload;
+      state.hasAllVoted = hasAllVoted;
+    },
   },
 });
 
@@ -47,7 +52,8 @@ export const {
   setCanvasState,
   setIsPromptSet,
   setGamePhase,
-  setPlayers
+  setPlayers,
+  setHasAllVoted,
 } = gameStateSlice.actions;
 
 export default gameStateSlice.reducer;
