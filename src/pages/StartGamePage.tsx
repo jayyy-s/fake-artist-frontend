@@ -23,7 +23,8 @@ const StartGamePage = () => {
       navigate(`game/${gameId}`);
     } catch (err) {
       const e = err as Error;
-      console.log(e?.message);
+      console.log(e);
+      console.log(import.meta.env.VITE_ENVIRONMENT);
     }
   };
 

@@ -1,5 +1,6 @@
 import { apiSlice } from "./apiSlice";
-const GAME_URL = "/api/game";
+const GAME_URL =
+  import.meta.env.VITE_ENVIRONMENT === "development" ? "/api/game" : "/game";
 
 export const gamesApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
