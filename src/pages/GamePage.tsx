@@ -21,7 +21,7 @@ import FakeArtistPoll from "../components/FakeArtistPoll/FakeArtistPoll";
 import { connectPlayer } from "../slices/playerSlice";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
-const BASE_URL = import.meta.env.VITE_BASE_URL!;
+const BASE_URL = window.location.origin;
 
 const GameScreen = () => {
   const clientReadyHandler = async () => {
