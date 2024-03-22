@@ -11,11 +11,6 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/dev /, ""),
       },
-      "/api": {
-        target: "https://fake-artist-backend.up.railway.app",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
     },
   },
 });
