@@ -143,7 +143,10 @@ const GameScreen = () => {
         </div>
         {gamePhase === gamePhases.voting &&
           (hasAllVoted || id !== questionMaster.id) && (
-            <FakeArtistPoll voterData={voterData} isQuestionMaster={id === questionMaster.id} />
+            <FakeArtistPoll
+              voterData={voterData}
+              isQuestionMaster={id === questionMaster.id}
+            />
           )}
       </div>
     </div>

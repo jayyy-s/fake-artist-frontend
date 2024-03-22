@@ -37,7 +37,7 @@ const PlayerListItem = (props: PlayerListItemProps) => {
         backgroundColor: props.colorCombo.primary,
       }}
     >
-      <div className="">{props.username}</div>
+      <div className="whitespace-nowrap">{props.username}</div>
       {props.voterData && (
         <div className="flex mt-1 bg-fake-white w-fit pl-1 py-1 rounded">
           {props.voterData.voterIds.map((voterId) => {
