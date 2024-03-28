@@ -8,15 +8,17 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   setCanvasState,
   setCurrentArtist,
+  setFakeArtistGuess,
   setHasAllVoted,
   setQuestionMaster,
+  setWinner,
 } from "../slices/gameStateSlice";
 import { useFetchGameByIdMutation } from "../slices/gamesApiSice";
 import { useEffect, useState } from "react";
 import { setGamePhase, setPlayers } from "../slices/gameStateSlice";
 import GameInformation from "../components/GameInformation";
 import { GameState, PlayerState } from "../types/sliceStateTypes";
-import { gamePhases } from "../types/enums";
+import { gamePhases, playerTypes } from "../types/enums";
 import FakeArtistPoll from "../components/FakeArtistPoll/FakeArtistPoll";
 import { connectPlayer } from "../slices/playerSlice";
 
@@ -119,19 +121,32 @@ const GameScreen = () => {
             dispatch(setHasAllVoted({ hasAllVoted: true }));
           }
           break;
+        case "setFakeArtistGuess":
+          if (lastJsonMessage.data.fakeArtistGuess) {
+            dispatch(
+              setFakeArtistGuess({
+                fakeArtistGuess: lastJsonMessage.data.fakeArtistGuess,
+              })
+            );
+          }
+          break;
+        case "fakeArtistWin":
+          dispatch(setWinner({ winner: playerTypes.fakeArtist }));
+          break;
+        case "realArtistsWin":
+          dispatch(setWinner({ winner: playerTypes.realArtist }));
+          break;
       }
     }
   }, [dispatch, lastJsonMessage]);
 
   return (
     <div className="px-12 py-12 h-screen flex flex-col">
-      <div className="text-fake-white">A Fake Artist</div>
+      <div className="text-fake-white mb-1">A Fake Artist</div>
       <div className="flex">
-        <div className="flex flex-col">
-          <GameInformation />
-          <PlayerList />
-        </div>
+        <PlayerList />
         <div className="flex flex-col mx-4">
+          <GameInformation />
           <DrawingBoard />
           <div
             onClick={copyUrl}

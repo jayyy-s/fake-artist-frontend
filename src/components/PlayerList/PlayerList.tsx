@@ -35,7 +35,7 @@ const PlayerList = () => {
   }, [currentArtist, dispatch, lastJsonMessage]);
 
   return (
-    <div className="flex flex-col px-2 pt-2 rounded border-black bg-fake-white">
+    <div className="flex flex-col px-2 pt-2 w-fit h-fit rounded border-black bg-fake-white">
       {players.map((p) => (
         <PlayerListItem
           username={p.username}

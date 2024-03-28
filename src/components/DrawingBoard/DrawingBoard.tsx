@@ -5,13 +5,14 @@ import { useParams } from "react-router-dom";
 import { useUpdateImageMutation } from "../../slices/gamesApiSice";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsHost, setIsQuestionMaster } from "../../slices/clientStateSlice";
-import DrawingBoardOverlay from "./DrawingBoardOverlay";
+import DrawingBoardOverlay from "./DrawingBoardOverlay/DrawingBoardOverlay";
 import {
   ClientState,
   GameState,
   PlayerState,
 } from "../../types/sliceStateTypes";
-import { gamePhases } from "../../types/enums";
+import { gamePhases, drawingBoardVariants } from "../../types/enums";
+import { setFakeArtistGuess } from "../../slices/gameStateSlice";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const CANVAS_WIDTH = 800;
@@ -35,6 +36,12 @@ const DrawingBoard = () => {
   const [isDrawingTurn, setIsDrawingTurn] = useState(false);
   const [prevPosition, setPreviousPosition] = useState({ x: 0, y: 0 });
 
+  const [isFakeArtistGuess, setIsFakeArtistGuess] = useState(false);
+  const [
+    isPromptQuestionMasterTitleCheck,
+    setIsPromptQuestionMasterTitleCheck,
+  ] = useState(false);
+
   const { colorCombo } = useSelector((state: PlayerState) => state.player);
   const { gameId } = useParams();
 
@@ -42,13 +49,15 @@ const DrawingBoard = () => {
 
   const dispatch = useDispatch();
 
-  const { canvasState, isPromptSet, gamePhase } = useSelector(
+  const { canvasState, isPromptSet, gamePhase, fakeArtistGuess } = useSelector(
     (state: GameState) => state.gameState
   );
 
-  const { isQuestionMaster } = useSelector(
+  const { isQuestionMaster, isHost } = useSelector(
     (state: ClientState) => state.clientState
   );
+
+  const { winner } = useSelector((state: GameState) => state.gameState);
 
   const { sendJsonMessage, lastJsonMessage } = useWebSocket<WebSocketData>(
     WS_URL,
@@ -128,6 +137,19 @@ const DrawingBoard = () => {
         case "promptQuestionMaster":
           dispatch(setIsQuestionMaster({ isQuestionMaster: true }));
           break;
+        case "promptFakeArtistGuess":
+          setIsFakeArtistGuess(true);
+          break;
+        case "promptQuestionMasterTitleCheck":
+          setIsPromptQuestionMasterTitleCheck(true);
+          if (lastJsonMessage.data.fakeArtistGuess) {
+            dispatch(
+              setFakeArtistGuess({
+                fakeArtistGuess: lastJsonMessage.data.fakeArtistGuess,
+              })
+            );
+          }
+          break;
       }
     }
   }, [lastJsonMessage, canvasState, dispatch]);
@@ -142,8 +164,27 @@ const DrawingBoard = () => {
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
       />
-      {(gamePhase === gamePhases.inactive ||
-        (isQuestionMaster && !isPromptSet)) && <DrawingBoardOverlay />}
+      {gamePhase === gamePhases.inactive && (
+        <DrawingBoardOverlay
+          variant={
+            isHost ? drawingBoardVariants.host : drawingBoardVariants.default
+          }
+        />
+      )}
+      {isQuestionMaster && !isPromptSet && gamePhase === gamePhases.active && (
+        <DrawingBoardOverlay variant={drawingBoardVariants.questionMaster} />
+      )}
+      {isFakeArtistGuess && !fakeArtistGuess && (
+        <DrawingBoardOverlay variant={drawingBoardVariants.fakeArtistGuess} />
+      )}
+      {!winner && isPromptQuestionMasterTitleCheck && (
+        <DrawingBoardOverlay
+          variant={drawingBoardVariants.questionMasterTitleCheck}
+        />
+      )}
+      {winner && (
+        <DrawingBoardOverlay variant={drawingBoardVariants.gameResult} />
+      )}
     </div>
   );
 };

@@ -52,6 +52,7 @@ const FakeArtistPoll = (props: FakeArtistPollProps) => {
             isSelected={!!votedPlayer && votedPlayer.id === p.id}
             setVotedPlayer={chooseVote}
             voterData={voterData?.find((data) => data.votedPlayerId === p.id)}
+            key={p.id}
           />
         ))}
       </div>

@@ -9,6 +9,8 @@ const initialState = {
   players: [],
   gamePhase: gamePhases.inactive,
   hasAllVoted: false,
+  fakeArtistGuess: "",
+  winner: "",
 };
 
 const gameStateSlice = createSlice({
@@ -43,6 +45,14 @@ const gameStateSlice = createSlice({
       const { hasAllVoted } = action.payload;
       state.hasAllVoted = hasAllVoted;
     },
+    setFakeArtistGuess: (state, action) => {
+      const { fakeArtistGuess } = action.payload;
+      state.fakeArtistGuess = fakeArtistGuess;
+    },
+    setWinner: (state, action) => {
+      const { winner } = action.payload;
+      state.winner = winner;
+    },
   },
 });
 
@@ -54,6 +64,8 @@ export const {
   setGamePhase,
   setPlayers,
   setHasAllVoted,
+  setFakeArtistGuess,
+  setWinner,
 } = gameStateSlice.actions;
 
 export default gameStateSlice.reducer;

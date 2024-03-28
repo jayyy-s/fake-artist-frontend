@@ -20,7 +20,8 @@ type WebSocketData = {
     title?: string;
     colorCombo?: ColorCombo;
     playerId?: number;
-    voterData: Vote[];
+    voterData?: Vote[];
+    fakeArtistGuess?: string;
   };
 };
 

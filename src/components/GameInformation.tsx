@@ -16,7 +16,9 @@ const GameInformation = () => {
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
 
-  const { questionMaster } = useSelector((state: GameState) => state.gameState);
+  const { questionMaster, currentArtist, fakeArtistGuess } = useSelector(
+    (state: GameState) => state.gameState
+  );
 
   useEffect(() => {
     if (lastJsonMessage) {
@@ -34,9 +36,17 @@ const GameInformation = () => {
 
   return (
     <div className="border rounded-md border-black bg-fake-white items-center justify-center py-2 px-4 mb-2">
-      <div>Question Master: {questionMaster ? questionMaster.username : ""}</div>
-      <div>Category: {category}</div>
-      <div>Title: {title}</div>
+      <div className="flex space-x-2">
+        <div>
+          Question Master: {questionMaster ? questionMaster.username : ""}
+        </div>
+        <div>Current Artist: {currentArtist ? currentArtist.username : ""}</div>
+      </div>
+      <div className="flex space-x-2">
+        <div>Category: {category}</div>
+        <div>Title: {title}</div>
+      </div>
+      {fakeArtistGuess && <div>Fake Artist Guess: {fakeArtistGuess}</div>}
     </div>
   );
 };

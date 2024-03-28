@@ -1,4 +1,4 @@
-import { GamePhase } from "./enums";
+import { GamePhase, PlayerType } from "./enums";
 
 type GameState = {
   gameState: {
@@ -9,6 +9,8 @@ type GameState = {
     gamePhase: GamePhase;
     players: Player[];
     hasAllVoted: boolean;
+    fakeArtistGuess: string;
+    winner: PlayerType;
   };
 };
 
