@@ -4,6 +4,7 @@ import { useCreateGameMutation } from "../slices/gamesApiSice";
 import { useDispatch } from "react-redux";
 import { setPlayerUsername } from "../slices/playerSlice";
 import { setCanvasState } from "../slices/gameStateSlice";
+import HowToPlay from "../components/HowToPlay";
 
 const StartGamePage = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const StartGamePage = () => {
   const [createGame] = useCreateGameMutation();
 
   const [username, setUsername] = useState("");
+  const [showHowToPlay, setShowHowToPlay] = useState(true);
 
   const handleCreateGame = async (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -37,7 +39,10 @@ const StartGamePage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-full">
+    <div className="flex justify-center items-center h-full w-full relative">
+      {showHowToPlay && (
+        <HowToPlay closeHowToPlay={() => setShowHowToPlay(false)} />
+      )}
       <div className="border rounded-md border-black bg-fake-white flex flex-col items-center justify-center w-72 h-36">
         <input
           onChange={handleUsernameInputChange}

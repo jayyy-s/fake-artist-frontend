@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import DrawingBoard from "../components/DrawingBoard/DrawingBoard";
 import PlayerList from "../components/PlayerList/PlayerList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCopy } from "@fortawesome/free-solid-svg-icons";
+import { faCircleQuestion, faCopy } from "@fortawesome/free-solid-svg-icons";
 import useWebSocket from "react-use-websocket";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -21,11 +21,14 @@ import { GameState, PlayerState } from "../types/sliceStateTypes";
 import { gamePhases, playerTypes } from "../types/enums";
 import FakeArtistPoll from "../components/FakeArtistPoll/FakeArtistPoll";
 import { connectPlayer } from "../slices/playerSlice";
+import HowToPlay from "../components/HowToPlay";
 
 const WS_URL = import.meta.env.VITE_WS_URL!;
 const BASE_URL = window.location.origin;
 
 const GameScreen = () => {
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+
   const clientReadyHandler = async () => {
     try {
       const game = await fetchGameById({ gameId }).unwrap();
@@ -141,7 +144,10 @@ const GameScreen = () => {
   }, [dispatch, lastJsonMessage]);
 
   return (
-    <div className="px-12 py-12 h-screen flex flex-col">
+    <div className="px-12 py-12 h-screen flex flex-col relative">
+      {showHowToPlay && (
+        <HowToPlay closeHowToPlay={() => setShowHowToPlay(false)} />
+      )}
       <div className="text-fake-white mb-1">A Fake Artist</div>
       <div className="flex">
         <PlayerList />
@@ -164,6 +170,11 @@ const GameScreen = () => {
             />
           )}
       </div>
+      <FontAwesomeIcon
+        icon={faCircleQuestion}
+        className="absolute text-fake-white right-4 bottom-3 cursor-pointer"
+        onClick={() => setShowHowToPlay(true)}
+      />
     </div>
   );
 };

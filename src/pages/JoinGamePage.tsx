@@ -2,6 +2,7 @@ import { ChangeEvent, MouseEvent, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setPlayerUsername } from "../slices/playerSlice";
+import HowToPlay from "../components/HowToPlay";
 
 const JoinGamePage = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const JoinGamePage = () => {
   const { gameId } = useParams();
 
   const [username, setUsername] = useState("");
+  const [showHowToPlay, setShowHowToPlay] = useState(true);
 
   const handleJoinGame = async (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -29,6 +31,9 @@ const JoinGamePage = () => {
 
   return (
     <div className="flex justify-center items-center h-full">
+      {showHowToPlay && (
+        <HowToPlay closeHowToPlay={() => setShowHowToPlay(false)} />
+      )}
       <div className="border rounded-md border-black bg-fake-white flex flex-col items-center justify-center w-72 h-36">
         <input
           onChange={handleUsernameInputChange}

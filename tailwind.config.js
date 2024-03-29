@@ -19,6 +19,15 @@ export default {
         "fake-purple": "#5C164E",
         "fake-white": "#F8F4F9",
       },
+      keyframes: {
+        slideIn: {
+          "0%": { transform: "translateY(30px)", opacity: "0" },
+          "100%": {transform: "translateY(0px)", opacity: "1"  },
+        },
+      },
+      animation: {
+        slideIn: "ease 400ms 1 slideIn",
+      },
     },
   },
   plugins: [
