@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://fake-artist-backend.onrender.com//$1"
+      "source": "/api/:path*",
+      "destination": "https://fake-artist-backend.onrender.com/:path*"
     },
     {
       "source": "/(.*)",
